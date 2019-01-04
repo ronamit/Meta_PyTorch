@@ -30,6 +30,7 @@ if run_experiments:
     for i_run, n_train_tasks in enumerate(n_tasks_vec):
         call(['python', 'main_Meta_Bayes.py',
               '--run-name', sub_runs_names[i_run],
+              '--gpu_index', '0',
               '--data-source', 'MNIST',
               '--data-transform', 'Permute_Labels',
               '--n_train_tasks', str(n_train_tasks),

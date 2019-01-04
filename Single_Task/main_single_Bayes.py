@@ -100,10 +100,6 @@ prm.log_var_init = {'mean': -10, 'std': 0.1} # The initial value for the log-var
 # Number of Monte-Carlo iterations (for re-parametrization trick):
 prm.n_MC = 1
 
-# prm.use_randomness_schedeule = True # False / True
-# prm.randomness_init_epoch = 0
-# prm.randomness_full_epoch = 500000000
-
 #  Define optimizer:
 prm.optim_func, prm.optim_args = optim.Adam,  {'lr': prm.lr}
 # prm.optim_func, prm.optim_args = optim.SGD, {'lr': prm.lr, 'momentum': 0.9}

@@ -26,6 +26,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--run-name', type=str, help='Name of dir to save results in (if empty, name by time)',
                     default='')
 
+parser.add_argument('--gpu_index', type=int,
+                    help='The index of GPU device to run on',
+                    default=0)
+
 parser.add_argument('--seed', type=int,  help='random seed',
                     default=5)
 
@@ -114,7 +118,7 @@ parser.add_argument('--lr', type=float, help='initial learning rate',
 # -------------------------------------------------------------------------------------------
 
 prm = parser.parse_args()
-prm.device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
+prm.device = torch.device("cuda:"+str(prm.gpu_index) if torch.cuda.is_available() else "cpu")
 prm.data_path = get_data_path()
 set_random_seed(prm.seed)
 create_result_dir(prm)

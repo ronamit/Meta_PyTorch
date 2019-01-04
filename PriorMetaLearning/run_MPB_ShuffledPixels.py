@@ -18,6 +18,7 @@ complexity_type = args.complexity_type
 
 call(['python', 'main_Meta_Bayes.py',
       '--run-name', 'Shuffled_{}_Pixels_{}_Tasks_{}_Comp'.format(n_pixels_shuffles, n_train_tasks, complexity_type),
+      '--gpu_index', '0',
       '--data-source', 'MNIST',
       '--data-transform', 'Shuffled_Pixels',
       '--n_pixels_shuffles', str(n_pixels_shuffles),

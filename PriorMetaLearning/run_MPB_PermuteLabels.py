@@ -17,7 +17,7 @@ complexity_type = args.complexity_type
 
 call(['python', 'main_Meta_Bayes.py',
       '--run-name', 'PermutedLabels_{}_Tasks_{}_Comp'.format(n_train_tasks, complexity_type),
-      '--gpu_index', '1',
+      '--gpu_index', '0',
       '--data-source', 'MNIST',
       '--data-transform', 'Permute_Labels',
       '--limit_train_samples_in_test_tasks', '2000',

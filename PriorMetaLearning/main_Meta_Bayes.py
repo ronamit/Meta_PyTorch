@@ -135,12 +135,12 @@ parser.add_argument('--init_from_prior', default=True, type=lambda x: (str(x).lo
 # -------------------------------------------------------------------------------------------
 
 prm = parser.parse_args()
-prm.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+prm.device = torch.device("cuda:"+str(prm.gpu_index) if torch.cuda.is_available() else "cpu")
 prm.data_path = get_data_path()
 
 
 # Weights initialization (for Bayesian net):
-prm.log_var_init = {'mean': -10, 'std': 0.1} # The initial value for the log-var parameter (rho) of each weight
+prm.log_var_init = {'mean': -10, 'std': 0.1}  # The initial value for the log-var parameter (rho) of each weight
 
 # Number of Monte-Carlo iterations:
 prm.n_MC = 1
