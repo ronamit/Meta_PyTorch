@@ -143,7 +143,7 @@ for i in range(n_experiments):
 
     #  Run Bayesian-learning of task 2 from scratch:
     write_to_log('---- Bayesian learning of task #2 from scratch', prm)
-    _, test_err_scratch_bayes[i], _ = learn_single_Bayes.run_learning(task2_data, prm, verbose=0)
+    _, test_err_scratch_bayes[i], _, _ = learn_single_Bayes.run_learning(task2_data, prm, verbose=0)
 
     #  Run learning of task 2 using transferred initial point:
     write_to_log('--- Standard learning of task #2 using transferred weights as initial point', prm)
