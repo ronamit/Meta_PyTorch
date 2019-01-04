@@ -127,10 +127,6 @@ parser.add_argument('--meta_batch_size', type=int, help='Maximal number of tasks
                     default=5)
 
 
-parser.add_argument('--divergence_type', type=str, help="",
-                    default='KL')  # 'KL' / 'W_Sqr' / 'W_NoSqr'
-
-
 parser.add_argument('--init_from_prior', default=True, type=lambda x: (str(x).lower() == 'true'))
 
 

@@ -29,10 +29,5 @@ call(['python', 'main_Meta_Bayes.py',
       '--n_meta_test_epochs', '200',
       '--n_test_tasks', '20',
       '--meta_batch_size', '5',
-      '--divergence_type', 'KL',  # ['KL', 'W_Sqr', 'W_NoSqr']:
       ])
 
-
-# KL-Seeger-  err: 0.756%, STD: 0.09%
-# KL-McAllester- err: 0.94%, STD: 0.0901%
-# W_Sqr-McAllester-  err: 3.69%, STD: 0.324%

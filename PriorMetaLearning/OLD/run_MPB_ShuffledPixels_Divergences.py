@@ -15,7 +15,6 @@ args = parser.parse_args()
 
 complexity_type = args.complexity_type
 
-divergence_type = 'KL' # 'KL' / 'W_Sqr' / W_NoSqr
 
 call(['python', 'main_Meta_Bayes.py',
       '--run-name', 'Shuffled_{}_Pixels_{}_Tasks_{}_Comp'.format(n_pixels_shuffles, n_train_tasks, complexity_type),
@@ -31,7 +30,6 @@ call(['python', 'main_Meta_Bayes.py',
       '--n_meta_test_epochs', '200',
       '--n_test_tasks', '20',
       '--meta_batch_size', '16',
-      '--divergence_type', divergence_type,
       ])
 
 

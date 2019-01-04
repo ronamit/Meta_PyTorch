@@ -29,6 +29,5 @@ call(['python', 'main_Meta_Bayes.py',
       '--n_meta_test_epochs', '200',
       '--n_test_tasks', '20',
       '--meta_batch_size', '16',
-      '--divergence_type', divergence_type,
       '--init_from_prior', 'True',
       ])

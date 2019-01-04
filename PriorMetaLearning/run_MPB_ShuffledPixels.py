@@ -30,12 +30,5 @@ call(['python', 'main_Meta_Bayes.py',
       '--n_meta_test_epochs', '200',
       '--n_test_tasks', '20',
       '--meta_batch_size', '5',
-      '--divergence_type', 'KL',  # ['KL', 'W_Sqr']:
       ])
-
-# note: I removed the relu in Segger so it gives NaNs
-# W-Seeger-  NaN
-# KL-Seeger- NaN
-# KL-McAllester- 1.94%, STD: 0.181%
-# W_Sqr-McAllester- err: 8.18%, STD: 0.674% we get a flat log-var graph with ~-10 (as in initilization)
 
