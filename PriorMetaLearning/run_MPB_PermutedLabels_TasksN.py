@@ -14,7 +14,7 @@ base_run_name = 'PermutedLabels_TasksN'
 min_n_tasks = 1  # 1
 max_n_tasks = 10  # 10
 
-run_experiments = False # If false, just analyze the previously saved experiments
+run_experiments = True # If false, just analyze the previously saved experiments
 
 root_saved_dir = 'saved/'
 # -------------------------------------------------------------------------------------------
