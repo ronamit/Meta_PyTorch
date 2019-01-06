@@ -30,7 +30,7 @@ def run_meta_learning(data_loaders, prm):
 
     n_train_tasks = len(data_loaders)
 
-    assert prm.meta_batch_size <= n_train_tasks
+    # assert prm.meta_batch_size <= n_train_tasks
 
     # Create posterior models for each task:
     posteriors_models = [get_model(prm) for _ in range(n_train_tasks)]
