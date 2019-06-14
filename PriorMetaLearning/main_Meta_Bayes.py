@@ -12,6 +12,7 @@ from Utils.data_gen import Task_Generator
 from Utils.common import save_model_state, load_model_state, create_result_dir, set_random_seed, write_to_log, save_run_data
 from Models.stochastic_models import get_model
 from PriorMetaLearning import meta_test_Bayes, meta_train_Bayes_finite_tasks, meta_train_Bayes_infinite_tasks
+from PriorMetaLearning  import meta_test_Prune
 from PriorMetaLearning.Analyze_Prior import run_prior_analysis
 
 torch.backends.cudnn.benchmark = True  # For speed improvement with models with fixed-length inputs
@@ -34,10 +35,10 @@ parser.add_argument('--seed', type=int,  help='random seed',
                     default=1)
 
 parser.add_argument('--mode', type=str, help='MetaTrain or LoadMetaModel',
-                    default='MetaTrain')   # 'MetaTrain'  \ 'LoadMetaModel'
+                    default='LoadMetaModel')   # 'MetaTrain'  \ 'LoadMetaModel'  ## TEMP ##
 
 parser.add_argument('--load_model_path', type=str, help='set the path to pre-trained model, in case it is loaded (if empty - set according to run_name)',
-                    default='')
+                    default='ExamplePrior/model.pt')  ## TEMP ##
 
 parser.add_argument('--test-batch-size',type=int,  help='input batch size for testing (reduce if memory is limited)',
                     default=512)
@@ -250,7 +251,9 @@ test_err_vec = np.zeros(n_test_tasks)
 for i_task in range(n_test_tasks):
     print('Meta-Testing task {} out of {}...'.format(1+i_task, n_test_tasks))
     task_data = test_tasks_data[i_task]
-    test_err_vec[i_task], _ = meta_test_Bayes.run_learning(task_data, prior_model, prm, init_from_prior, verbose=0)
+    # test_err_vec[i_task], _ = meta_test_Bayes.run_learning(task_data, prior_model, prm, init_from_prior, verbose=0)  ## TEMP ##
+    test_err_vec[i_task], _ = meta_test_Prune.run_learning(task_data, prior_model, prm, verbose=0) ## TEMP ##
+
 
 
 # save result

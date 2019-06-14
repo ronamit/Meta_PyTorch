@@ -200,7 +200,7 @@ def create_result_dir(prm, run_experiments=True):
 
     if run_experiments:
         # If run_name empty, set according to time
-        time_str = datetime.now().strftime(' %Y-%m-%d %H:%M:%S')
+        time_str = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
         if prm.run_name == '':
             prm.run_name = time_str
         prm.result_dir = os.path.join('saved', prm.run_name)

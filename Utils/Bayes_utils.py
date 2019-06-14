@@ -52,7 +52,7 @@ def run_eval_max_posterior(model, loader, prm):
     avg_loss /= n_samples
     acc = n_correct / n_samples
     info = {'acc':acc, 'n_correct':n_correct,
-            'n_samples':n_samples, 'avg_loss':avg_loss}
+            'n_samples': n_samples, 'avg_loss': avg_loss}
     return info
 
 
