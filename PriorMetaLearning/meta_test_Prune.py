@@ -134,7 +134,7 @@ def run_learning(task_data, prior_model, prm, verbose=1):
 
 
 # -------------------------------------------------------------------------------------------
-#  Test evaluation function A
+#  Test evaluation function Aa
 # --------------------------------------------------------------------------------------------
 def run_test(model, test_loader, loss_criterion, prm, net_weights):
     model.eval()
