@@ -14,6 +14,7 @@ from Models.stochastic_models import get_model
 from PriorMetaLearning import meta_test_Bayes, meta_train_Bayes_finite_tasks, meta_train_Bayes_infinite_tasks
 from PriorMetaLearning  import meta_test_Prune
 from PriorMetaLearning.Analyze_Prior import run_prior_analysis
+import matplotlib.pyplot as plt
 
 torch.backends.cudnn.benchmark = True  # For speed improvement with models with fixed-length inputs
 # -------------------------------------------------------------------------------------------
@@ -35,7 +36,7 @@ parser.add_argument('--seed', type=int,  help='random seed',
                     default=1)
 
 parser.add_argument('--mode', type=str, help='MetaTrain or LoadMetaModel',
-                    default='MetaTrain')   # 'MetaTrain'  \ 'LoadMetaModel'  ## TEMP ##
+                    default='LoadMetaModel')   # 'MetaTrain'  \ 'LoadMetaModel'  ## TEMP ##
 
 parser.add_argument('--load_model_path', type=str, help='set the path to pre-trained model, in case it is loaded (if empty - set according to run_name)',
                     default='ExamplePrior/model.pt')  ## TEMP ##
@@ -247,12 +248,17 @@ test_tasks_data = task_generator.create_meta_batch(prm, n_test_tasks, meta_split
 # -------------------------------------------------------------------------------
 write_to_log('Meta-Testing with transferred prior....', prm)
 
-test_err_vec = np.zeros(n_test_tasks)
-for i_task in range(n_test_tasks):
-    print('Meta-Testing task {} out of {}...'.format(1+i_task, n_test_tasks))
-    task_data = test_tasks_data[i_task]
-    test_err_vec[i_task], _ = meta_test_Bayes.run_learning(task_data, prior_model, prm, init_from_prior, verbose=0)
-    # test_err_vec[i_task], _ = meta_test_Prune.run_learning(task_data, prior_model, prm, verbose=0) ## TEMP ##
+prune_percentile_range = [0, 10, 20, 30, 40, 50]
+
+test_err_vec = np.zeros([n_test_tasks, len(prune_percentile_range)])
+
+for i_pp, prune_percentile in enumerate(prune_percentile_range):
+    write_to_log('Prune percent {}% ....'.format(prune_percentile), prm)
+    for i_task in range(n_test_tasks):
+        print('Meta-Testing task {} out of {}...'.format(1+i_task, n_test_tasks))
+        task_data = test_tasks_data[i_task]
+        test_err_vec[i_task, i_pp], _ = meta_test_Prune.run_learning(task_data, prior_model, prm, verbose=0,  prune_percentile=prune_percentile)
+
 
 
 
@@ -271,9 +277,14 @@ write_to_log('Total runtime: ' +
              time.strftime("%H hours, %M minutes and %S seconds", time.gmtime(stop_time - start_time)),  prm)
 
 #  Print results
-write_to_log('----- Final Results: ', prm)
-write_to_log('----- Meta-Testing - Avg test err: {:.3}%, STD: {:.3}%'
-             .format(100 * test_err_vec.mean(), 100 * test_err_vec.std()), prm)
+plt.figure()
+plt.errorbar(prune_percentile_range, 100 * test_err_vec.mean(axis=0), yerr=100 * 100 * test_err_vec.std(axis=0))
+plt.xlabel('Prune rate [%]', fontsize=18)
+plt.ylabel('Error on new task [%]', fontsize=18)
+plt.show()
+
+
+
 
 # -------------------------------------------------------------------------------------------
 #  Compare to standard learning

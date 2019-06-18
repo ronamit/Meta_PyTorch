@@ -12,9 +12,11 @@ from Utils.Losses import get_loss_func
 import Models.deterministic_models as func_models
 from Models.stochastic_layers import StochasticLayer
 import torch
-# from Single_Task.learn_single_standard import run_test
+from Single_Task.learn_single_standard import run_test
+import numpy as np
+import matplotlib.pyplot as plt
 
-def run_learning(task_data, prior_model, prm, verbose=1):
+def run_learning(task_data, orig_prior_model, prm, verbose=1, prune_percentile=0):
 
     # -------------------------------------------------------------------------------------------
     #  Setting-up
@@ -41,10 +43,43 @@ def run_learning(task_data, prior_model, prm, verbose=1):
     optimizer = optim_func(model.parameters(), **optim_args)
 
     # Create Pruned NN:
+    prior_model = get_model(prm)
+    prior_model.load_state_dict(orig_prior_model.state_dict())
+
+    prior_layers_list = OrderedDict(
+        (name, layer) for (name, layer) in prior_model.named_children() if isinstance(layer, StochasticLayer))
+
 
     # no need for gradients of prior
     for param in prior_model.parameters():
         param.requires_grad = False
+
+    # # Find the values histogram of the log-var parameters
+    # log_var_values = []
+    # for layer_name, prior_layer in prior_layers_list.items():
+    #     log_var_w = prior_layer.w_log_var
+    #     log_var_b = prior_layer.b_log_var
+    #     log_var_values = np.append(log_var_values, log_var_w[:].cpu().numpy())
+    #     log_var_values = np.append(log_var_values, log_var_b[:].cpu().numpy())
+    # plt.hist(log_var_values, bins='auto')  # arguments are passed to np.histogram
+    # plt.title("Histogram of log-var values in prior")
+    # plt.show()
+    # plt.xlabel('log-variance of weight')
+    # plt.ylabel('number of weights')
+
+
+    # Prune bu threshold -per layer :
+    for layer_name, prior_layer in prior_layers_list.items():
+        log_var_w = prior_layer.w_log_var
+        log_var_b = prior_layer.b_log_var
+
+        log_var_values = log_var_w[:].cpu().numpy()
+        np.append(log_var_values, log_var_b[:].cpu().numpy())
+        prune_percentile = 0
+        log_var_threshold = np.percentile(log_var_values, prune_percentile)
+        prior_layer.w_log_var[log_var_w <= log_var_threshold] = 0
+        prior_layer.b_log_var[log_var_b <= log_var_threshold] = 0
+
 
     # -------------------------------------------------------------------------------------------
     #  Training epoch  function
@@ -52,8 +87,7 @@ def run_learning(task_data, prior_model, prm, verbose=1):
 
     def run_train_epoch(i_epoch):
         log_interval = 500
-        prior_layers_list = OrderedDict((name, layer) for (name, layer) in prior_model.named_children()
-            if isinstance(layer, StochasticLayer))
+
         model.train()
         for batch_idx, batch_data in enumerate(train_loader):
 
@@ -77,7 +111,7 @@ def run_learning(task_data, prior_model, prm, verbose=1):
                     raise ValueError('Unrecognized weight_type')
                 std = torch.exp(0.5 * log_var)
                 param_tuned = mu + std * param
-                #TODO: prune lower precntile of std values qa
+                #TODO: prune lower precntile of std values
                 net_weights.update({name: param_tuned})
 
             # Calculate empirical loss:
@@ -91,7 +125,6 @@ def run_learning(task_data, prior_model, prm, verbose=1):
 
             # Take gradient step with the posterior:
             grad_step(total_objective, optimizer, lr_schedule, prm.lr, i_epoch)
-
 
             # Print status:
             if batch_idx % log_interval == 0:
@@ -115,14 +148,16 @@ def run_learning(task_data, prior_model, prm, verbose=1):
     start_time = timeit.default_timer()
 
     # Training loop:
-    prm.n_meta_test_epochs = 10 # TODO: fix
+    prm.n_meta_test_epochs = 5 # TODO: fix
     for i_epoch in range(prm.n_meta_test_epochs):
         net_weights = run_train_epoch(i_epoch)
 
+    # Assign new weight to network
+    for (name, param) in model.named_parameters():
+        param.data = net_weights[name]
 
     # Test:
-    # TODO: set net_weights as the paramters of the model and use  from Single_Task.learn_single_standard import run_test
-    test_acc, _ = run_test(model, test_loader, loss_criterion, prm, net_weights)
+    test_acc, _ = run_test(model, test_loader, loss_criterion, prm)
 
     stop_time = timeit.default_timer()
     cmn.write_final_result(test_acc, stop_time - start_time, prm, result_name=prm.test_type, verbose=verbose)
@@ -132,25 +167,3 @@ def run_learning(task_data, prior_model, prm, verbose=1):
 
 
 
-
-# -------------------------------------------------------------------------------------------
-#  Test evaluation function Aaa
-# --------------------------------------------------------------------------------------------
-def run_test(model, test_loader, loss_criterion, prm, net_weights):
-    model.eval()
-    test_loss = 0
-    n_correct = 0
-    for batch_data in test_loader:
-        inputs, targets = data_gen.get_batch_vars(batch_data, prm)
-        batch_size = inputs.shape[0]
-        outputs = model(inputs, net_weights)
-        test_loss += (1 / batch_size) * loss_criterion(outputs, targets).item()  # sum the mean loss in batch
-        n_correct += count_correct(outputs, targets)
-
-    n_test_samples = len(test_loader.dataset)
-    n_test_batches = len(test_loader)
-    test_loss = test_loss / n_test_batches
-    test_acc = n_correct / n_test_samples
-    print('\n Standard learning: test loss: {:.4}, test err: {:.3} ( {}/{})\n'.format(
-        test_loss, 1-test_acc, n_correct, n_test_samples))
-    return test_acc, test_loss
