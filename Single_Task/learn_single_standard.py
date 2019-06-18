@@ -106,7 +106,7 @@ def run_learning(data_loader, prm, verbose=1, initial_model=None):
         run_train_epoch(i_epoch)
 
     # Test:
-    test_acc = run_test(model, test_loader, loss_criterion, prm)
+    test_acc, _ = run_test(model, test_loader, loss_criterion, prm)
 
     stop_time = timeit.default_timer()
     cmn.write_final_result(test_acc, stop_time - start_time, prm, verbose=verbose, result_name='Standard')
@@ -135,4 +135,5 @@ def run_test(model, test_loader, loss_criterion, prm):
     test_acc = n_correct / n_test_samples
     print('\n Standard learning: test loss: {:.4}, test err: {:.3} ( {}/{})\n'.format(
         test_loss, 1-test_acc, n_correct, n_test_samples))
-    return test_acc
+    return test_acc, test_loss
+

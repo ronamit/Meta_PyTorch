@@ -11,6 +11,7 @@ from Utils import common as cmn, data_gen
 from Utils.common import grad_step, correct_rate, write_to_log, count_correct
 from Utils.Losses import get_loss_func
 from torch.optim import SGD
+from Single_Task.learn_single_standard import run_test
 
 def run_learning(task_data, meta_model, prm, verbose=1):
 
@@ -64,28 +65,7 @@ def run_learning(task_data, meta_model, prm, verbose=1):
 
         return task_model
 
-    # -------------------------------------------------------------------------------------------
-    #  Test evaluation function
-    # --------------------------------------------------------------------------------------------
-    def run_test(model, test_loader):
-        model.eval()
-        test_loss = 0
-        n_correct = 0
-        for batch_data in test_loader:
-            inputs, targets = data_gen.get_batch_vars(batch_data, prm)
-            batch_size = inputs.shape[0]
-            outputs = model(inputs)
-            test_loss += (1 / batch_size) * loss_criterion(outputs, targets)  # sum the mean loss in batch
-            n_correct += count_correct(outputs, targets)
 
-        n_test_samples = len(test_loader.dataset)
-        n_test_batches = len(test_loader)
-        test_loss = test_loss.item() / n_test_batches
-        test_acc = n_correct / n_test_samples
-        print('\nTest set: Average loss: {:.4}, Accuracy: {:.3} ( {}/{})\n'.format(
-            test_loss, test_acc, n_correct, n_test_samples))
-        return test_acc
-          
 
     # -----------------------------------------------------------------------------------------------------------#
     # Update Log file
@@ -101,7 +81,7 @@ def run_learning(task_data, meta_model, prm, verbose=1):
     task_model = run_meta_test_learning(task_model, train_loader)
 
     # Test:
-    test_acc = run_test(task_model, test_loader)
+    test_acc, _ = run_test(task_model, test_loader, loss_criterion, prm)
 
     stop_time = timeit.default_timer()
     cmn.write_final_result(test_acc, stop_time - start_time, prm, verbose=verbose)
