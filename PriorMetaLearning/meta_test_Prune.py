@@ -77,7 +77,7 @@ def run_learning(task_data, prior_model, prm, verbose=1):
                     raise ValueError('Unrecognized weight_type')
                 std = torch.exp(0.5 * log_var)
                 param_tuned = mu + std * param
-                #TODO: prune lower precntile of std values
+                #TODO: prune lower precntile of std values qa
                 net_weights.update({name: param_tuned})
 
             # Calculate empirical loss:
