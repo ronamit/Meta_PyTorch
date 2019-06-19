@@ -74,7 +74,7 @@ def get_task_complexity(prm, prior_model, post_model, n_samples, avg_empiric_los
     complexity_type = prm.complexity_type
     delta = prm.delta  #  maximal probability that the bound does not hold
 
-    if not dvrg:
+    if dvrg is None:
         # calculate divergence between posterior and sampled prior
         dvrg = get_net_densities_divergence(prior_model, post_model, prm, noised_prior)
 

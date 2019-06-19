@@ -75,7 +75,7 @@ def run_learning(task_data, orig_prior_model, prm, verbose=1, prune_percentile=0
 
         log_var_values = log_var_w[:].cpu().numpy()
         np.append(log_var_values, log_var_b[:].cpu().numpy())
-        prune_percentile = 0
+        # prune_percentile = 0
         log_var_threshold = np.percentile(log_var_values, prune_percentile)
         prior_layer.w_log_var[log_var_w <= log_var_threshold] = 0
         prior_layer.b_log_var[log_var_b <= log_var_threshold] = 0

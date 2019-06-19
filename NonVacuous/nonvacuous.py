@@ -61,7 +61,7 @@ parser.add_argument('--loss-type', type=str, help="Data: 'CrossEntropy' / 'L2_SV
                     default='CrossEntropy')
 
 parser.add_argument('--model-name', type=str, help="Define model type (hypothesis class)'",
-                    default='OmConvNet_NoBN')  # OmConvNet / 'FcNet3' / 'ConvNet3' / OmConvNet_NoBN / OmConvNet_NoBN_elu
+                    default='ConvNet3')  # OmConvNet / 'FcNet3' / 'ConvNet3' / OmConvNet_NoBN / OmConvNet_NoBN_elu
 
 parser.add_argument('--batch-size', type=int, help='input batch size for training',
                     default=128)
@@ -121,9 +121,9 @@ prm.log_figure = {
     'val_types':  [['train_loss'], ['test_loss'],
              ['Bound', 'McAllester', 'KL'], ['Bound', 'McAllester', 'W_Sqr'], ['Bound', 'McAllester', 'W_NoSqr']]}
 
-prm.run_name = 'cifarr_epochs'
+prm.run_name = 'temp'
 
-run_experiments = False  # True/False If false, just analyze the previously saved experiments
+run_experiments = True  # True/False If false, just analyze the previously saved experiments
 
 # -------------------------------------------------------------------------------------------
 #  Init run

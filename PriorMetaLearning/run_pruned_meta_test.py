@@ -248,7 +248,8 @@ test_tasks_data = task_generator.create_meta_batch(prm, n_test_tasks, meta_split
 # -------------------------------------------------------------------------------
 write_to_log('Meta-Testing with transferred prior....', prm)
 
-prune_percentile_range = [0, 10, 20, 30, 40, 50]
+prune_percentile_range = [0, 10, 20, 30, 40, 50, 60, 70, 80]
+# prune_percentile_range = [90]
 
 test_err_vec = np.zeros([n_test_tasks, len(prune_percentile_range)])
 
@@ -278,9 +279,9 @@ write_to_log('Total runtime: ' +
 
 #  Print results
 plt.figure()
-plt.errorbar(prune_percentile_range, 100 * test_err_vec.mean(axis=0), yerr=100 * 100 * test_err_vec.std(axis=0))
-plt.xlabel('Prune rate [%]', fontsize=18)
-plt.ylabel('Error on new task [%]', fontsize=18)
+plt.errorbar(prune_percentile_range, 100 * test_err_vec.mean(axis=0), yerr=100 * test_err_vec.std(axis=0))
+plt.xlabel('Prune rate [%]', fontsize=12)
+plt.ylabel('Error on new task [%]', fontsize=12)
 plt.show()
 
 
