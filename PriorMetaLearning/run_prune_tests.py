@@ -39,7 +39,7 @@ parser.add_argument('--mode', type=str, help='MetaTrain or LoadMetaModel',
                     default='LoadMetaModel')   # 'MetaTrain'  \ 'LoadMetaModel'  ## TEMP ##
 
 parser.add_argument('--load_model_path', type=str, help='set the path to pre-trained model, in case it is loaded (if empty - set according to run_name)',
-                    default='ExamplePrior/model.pt')  ## TEMP ##
+                    default='ExamplePrior/model_VB_pixel_perm.pt')  ## TEMP ##
 
 parser.add_argument('--test-batch-size',type=int,  help='input batch size for testing (reduce if memory is limited)',
                     default=512)
@@ -58,14 +58,14 @@ parser.add_argument('--n_train_tasks', type=int, help='Number of meta-training t
                     default=5)
 
 parser.add_argument('--data-transform', type=str, help="Data transformation:  'None' / 'Permute_Pixels' / 'Permute_Labels'/ Shuffled_Pixels ",
-                    default='None')
+                    default='Shuffled_Pixels')
 
 parser.add_argument('--n_pixels_shuffles', type=int, help='In case of "Shuffled_Pixels": how many pixels swaps',
                     default=200)
 
 parser.add_argument('--limit_train_samples_in_test_tasks', type=int,
                     help='Upper limit for the number of training samples in the meta-test tasks (0 = unlimited)',
-                    default=0)
+                    default=2000)
 
 # N-Way K-Shot Parameters:
 parser.add_argument('--N_Way', type=int, help='Number of classes in a task (for Omniglot)',
@@ -97,7 +97,7 @@ parser.add_argument('--n_meta_train_chars'
 
 parser.add_argument('--complexity_type', type=str,
                     help=" The learning objective complexity type",
-                    default='Seeger')  #  'NoComplexity' /  'Variational_Bayes' / 'PAC_Bayes_Pentina'   McAllester / Seeger'"
+                    default='Variational_Bayes')  #  'NoComplexity' /  'Variational_Bayes' / 'PAC_Bayes_Pentina'   McAllester / Seeger'"
 
 # parser.add_argument('--override_eps_std', type=float,
 #                     help='For debug: set the STD of epsilon variable for re-parametrization trick (default=1.0)',
@@ -107,7 +107,7 @@ parser.add_argument('--loss-type', type=str, help="Loss function",
                     default='CrossEntropy') #  'CrossEntropy' / 'L2_SVM'
 
 parser.add_argument('--model-name', type=str, help="Define model type (hypothesis class)'",
-                    default='ConvNet3')  # OmConvNet / 'FcNet3' / 'ConvNet3'
+                    default='FcNet3')  # OmConvNet / 'FcNet3' / 'ConvNet3'
 
 parser.add_argument('--batch-size', type=int, help='input batch size for training',
                     default=128)
@@ -248,8 +248,9 @@ test_tasks_data = task_generator.create_meta_batch(prm, n_test_tasks, meta_split
 # -------------------------------------------------------------------------------
 write_to_log('Meta-Testing with transferred prior....', prm)
 
-prune_percentile_range = [0, 10, 20, 30, 40, 50, 60, 70, 80]
-# prune_percentile_range = [90]
+# prune_percentile_range = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+# prune_percentile_range = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+prune_percentile_range = [0]
 
 test_err_vec = np.zeros([n_test_tasks, len(prune_percentile_range)])
 
@@ -259,10 +260,8 @@ for i_pp, prune_percentile in enumerate(prune_percentile_range):
         print('Meta-Testing task {} out of {}...'.format(1+i_task, n_test_tasks))
         task_data = test_tasks_data[i_task]
         test_err_vec[i_task, i_pp], _ = meta_test_Prune.run_learning(task_data, prior_model, prm, verbose=0,  prune_percentile=prune_percentile)
-
-
-
-
+    write_to_log('----- Meta-Testing - Prune percent {}% - Avg test err: {:.3}%, STD: {:.3}%'
+                 .format(prune_percentile, 100 * test_err_vec[:, i_pp].mean(), 100 * test_err_vec[:, i_pp].std()), prm)
 
 # save result
 save_run_data(prm, {'test_err_vec': test_err_vec})
@@ -280,8 +279,8 @@ write_to_log('Total runtime: ' +
 #  Print results
 plt.figure()
 plt.errorbar(prune_percentile_range, 100 * test_err_vec.mean(axis=0), yerr=100 * test_err_vec.std(axis=0))
-plt.xlabel('Prune rate [%]', fontsize=12)
-plt.ylabel('Error on new task [%]', fontsize=12)
+plt.xlabel('Prune rate [%]', fontsize=18)
+plt.ylabel('Error on new task [%]', fontsize=18)
 plt.show()
 
 

@@ -36,6 +36,9 @@ parser.add_argument('--data-source', type=str, help="Data: 'MNIST' / 'CIFAR10' /
 parser.add_argument('--data-transform', type=str, help="Data transformation:  'None' / 'Permute_Pixels' / 'Permute_Labels'/ Shuffled_Pixels ",
                     default='None')
 
+parser.add_argument('--n_pixels_shuffles', type=int, help='In case of "Shuffled_Pixels": how many pixels swaps',
+                    default=200)
+
 parser.add_argument('--limit_train_samples', type=int,
                     help='Upper limit for the number of training samples (0 = unlimited)',
                     default=0)
@@ -78,7 +81,7 @@ parser.add_argument('--batch-size', type=int, help='input batch size for trainin
                     default=128)
 
 parser.add_argument('--num-epochs', type=int, help='number of epochs to train',
-                    default=50)
+                    default=100)
 
 parser.add_argument('--lr', type=float, help='initial learning rate',
                     default=1e-3)

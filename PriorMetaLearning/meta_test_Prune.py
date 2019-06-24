@@ -77,8 +77,8 @@ def run_learning(task_data, orig_prior_model, prm, verbose=1, prune_percentile=0
         np.append(log_var_values, log_var_b[:].cpu().numpy())
         # prune_percentile = 0
         log_var_threshold = np.percentile(log_var_values, prune_percentile)
-        prior_layer.w_log_var[log_var_w <= log_var_threshold] = 0
-        prior_layer.b_log_var[log_var_b <= log_var_threshold] = 0
+        prior_layer.w_log_var[log_var_w < log_var_threshold] = 0
+        prior_layer.b_log_var[log_var_b < log_var_threshold] = 0
 
 
     # -------------------------------------------------------------------------------------------
@@ -141,6 +141,7 @@ def run_learning(task_data, orig_prior_model, prm, verbose=1, prune_percentile=0
     # Update Log file
     if verbose == 1:
         write_to_log('Total number of steps: {}'.format(n_batches * prm.n_meta_test_epochs), prm)
+        write_to_log('Number of training samples: {}'.format(task_data['n_train_samples']), prm)
 
     # -------------------------------------------------------------------------------------------
     #  Run epochs
@@ -148,7 +149,7 @@ def run_learning(task_data, orig_prior_model, prm, verbose=1, prune_percentile=0
     start_time = timeit.default_timer()
 
     # Training loop:
-    prm.n_meta_test_epochs = 5 # TODO: fix
+    prm.n_meta_test_epochs = 10 # TODO: fix
     for i_epoch in range(prm.n_meta_test_epochs):
         net_weights = run_train_epoch(i_epoch)
 

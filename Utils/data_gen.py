@@ -324,9 +324,9 @@ def reduce_train_set(train_dataset, limit_train_samples):
     # Limit the training samples :
     n_train_samples_orig = len(train_dataset)
     if limit_train_samples and limit_train_samples < n_train_samples_orig:
-        if isinstance(train_dataset.train_data, np.ndarray):
+        if isinstance(train_dataset.data, np.ndarray):
             sampled_inds = np.random.permutation(n_train_samples_orig)[:limit_train_samples]
-            train_dataset.train_data = train_dataset.train_data[sampled_inds]
+            train_dataset.data = train_dataset.data[sampled_inds]
             train_dataset.train_labels = np.array(train_dataset.train_labels)[sampled_inds]
         else:
             sampled_inds = torch.randperm(n_train_samples_orig)[:limit_train_samples]
